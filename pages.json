@@ -1,0 +1,110 @@
+{
+	//页面路由
+	"pages": [{
+		"path": "pages/index/index",
+		"style": {
+			"navigationBarTitleText": "会务公开"
+		}
+	}, {
+		"path": "pages/meeting/index",
+		"style": {
+			"navigationBarTitleText": "会议管理"
+		}
+	}, 
+	{
+		"path": "pages/message/index",
+		"style": {
+			"navigationBarTitleText": "消息中心"
+		}
+	}, {
+		"path": "pages/index/detail1",
+		"style": {
+			"navigationBarTitleText": "会议议程"
+		}
+	}, {
+		"path": "pages/index/detail2",
+		"style": {
+			"navigationBarTitleText": "会议日程"
+		}
+	}, {
+		"path": "pages/index/detail3",
+		"style": {
+			"navigationBarTitleText": "会议机构"
+		}
+	}, {
+		"path": "pages/index/detail4",
+		"style": {
+			"navigationBarTitleText": "参会人员"
+		}
+	}, {
+		"path": "pages/index/detail5",
+		"style": {
+			"navigationBarTitleText": "坐席安排"
+		}
+	}, {
+		"path": "pages/index/detail6",
+		"style": {
+			"navigationBarTitleText": "工作报告"
+		}
+	}, {
+		"path": "pages/index/detail7",
+		"style": {
+			"navigationBarTitleText": "会议提案"
+		}
+	}, {
+		"path": "pages/index/detail8",
+		"style": {
+			"navigationBarTitleText": "会议须知"
+		}
+	}, {
+		"path": "pages/message/detail",
+		"style": {
+			"navigationBarTitleText": "会议通知"
+		}
+	}, {
+		"path": "pages/message/detail1",
+		"style": {
+			"navigationBarTitleText": "提案征集通知"
+		}
+	}, {
+		"path": "pages/meeting/vote",
+		"style": {
+			"navigationBarTitleText": "会议投票"
+		}
+	}, {
+		"path": "pages/meeting/decision",
+		"style": {
+			"navigationBarTitleText": "会议表决"
+		}
+	}],
+	//底部导航
+	"tabBar": {
+		"color": "#7A7E83",
+		"selectedColor": "#007BFF",
+		"backgroundColor": "#ffffff",
+		"borderStyle": "black",
+		"list": [{
+			"pagePath": "pages/index/index",
+			"iconPath": "static/image/tian_icon.png",
+			"selectedIconPath": "static/image/tian_click.png",
+			"text": "会务公开"
+		}, {
+			"pagePath": "pages/meeting/index",
+			"iconPath": "static/image/meeting_icon.png",
+			"selectedIconPath": "static/image/meeting_click.png",
+			"text": "会议管理"
+		}, {
+			"pagePath": "pages/message/index",
+			"iconPath": "static/image/message_icon.png",
+			"selectedIconPath": "static/image/message_click.png",
+			"text": "消息中心"
+		}]
+	},
+	//全局样式
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#FFFFFF"
+	}
+}
