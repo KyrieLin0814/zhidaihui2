@@ -1,78 +1,42 @@
-//接口地址
-const baseUrl = 'http://zdxx.51meilun.com:10086/zdxx/dataService?switch_json=';
-
-//带Token请求
-const httpRequest = (opts, data, noLoading) => {
-	//请求前后是否显示loading
-	noLoading = noLoading || false;
-	
-	let token = "";
-	//此token是登录成功后后台返回保存在storage中的
-	uni.getStorage({
-		key: 'token',
-		success: function(ress) {
-			token = ress.data
-		}
+const baseUrl = 'http://test.51meilun.com:9102/api'
+const request = (url = '', data = {}, type = 'GET', header) => {
+	return new Promise((resolve, reject) => {
+		uni.showLoading({
+			title: '加载中',
+			mask: true
+		})
+		let token =  uni.getStorageSync('token');
+		uni.request({
+			method: type,
+			url: baseUrl + url,
+			data: data,
+			header: {
+				...header,
+				...{
+					'content-type': "application/json",
+					'token': token
+				}
+			},
+			dataType: 'json',
+		}).then((response) => {
+			let [error, res] = response;
+			console.log(response)
+			//请求成功
+			if(res.data.code == 0){
+				uni.hideLoading();
+				resolve(res.data);
+			}else{
+				uni.showToast({
+				    title: res.data.msg,
+				    duration: 1500,
+					icon : 'none'
+				});
+				uni.hideLoading();
+			}
+		}).catch(error => {
+			let [err, res] = error;
+			reject(err)
+		})
 	});
-	if(token){
-		opts.token = token;
-	}
-	
-	//按照接口文档格式整理参数
-	let param = {
-		action: {
-			serviceCode: "zdxxCode",
-			traceID: "111111",
-			...opts,
-		},
-		body:data?data:{}
-	}
-	
-	// else{
-	// 	if(opts.url != "user/login"){
-	// 		uni.redirectTo({
-	// 			url: "/pages/index/index"
-	// 		});
-	// 	}
-	// }
-	
-	let httpDefaultOpts = {
-		url: baseUrl + JSON.stringify(param),
-		method: "POST",
-		header: {
-			'X-Requested-With': 'XMLHttpRequest',
-			'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-		},
-		dataType: 'json',
-	}
-	let promise = new Promise(function(resolve, reject) {
-		if(!noLoading){
-			uni.showLoading({
-				title:'加载中',
-				mask:true
-			})
-		}
-		uni.request(httpDefaultOpts).then(
-			(res) => {
-				if(!noLoading){
-					uni.hideLoading();
-				}
-				console.log(res[1].data)
-				resolve(res[1])
-			}
-		).catch(
-			(response) => {
-				if(!noLoading){
-					uni.hideLoading();
-				}
-				reject(response)
-			}
-		)
-	})
-	return promise
-};
-
-export default {
-	baseUrl,
-	httpRequest,
 }
+export default request

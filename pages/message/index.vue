@@ -49,6 +49,11 @@
 				this.type = e;
 			},
 			getList() {
+				this.$request('/huiyi/sysmessage/list').then(res => {
+					
+				})
+				
+				
 				setTimeout(()=>{
 					this.messageList = [...this.messageList,...[{
 						type: 1,

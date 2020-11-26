@@ -51,6 +51,14 @@
 				}]
 			}
 		},
+		mounted() {
+			//登录
+			this.$request('/huiyi/user/login', {
+				userId:'1'
+			},'POST').then(res => {
+				uni.setStorageSync('token', res.data.token);
+			})
+		},
 		methods: {
 
 		}
