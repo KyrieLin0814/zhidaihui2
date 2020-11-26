@@ -56,7 +56,7 @@
 			this.$request('/huiyi/user/login', {
 				userId:'1'
 			},'POST').then(res => {
-				uni.setStorageSync('token', res.data.token);
+				uni.setStorageSync('token', res.token);
 			})
 		},
 		methods: {

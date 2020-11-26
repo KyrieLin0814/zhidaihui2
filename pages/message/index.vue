@@ -10,11 +10,11 @@
 				<view class="msgList">
 					<view class="con" v-for="(item,index) in messageList" :key="index" @click="toPage(item)">
 						<div class="til text-1">
-							<span :class="[{'meeting': item.type==1},{'tian': item.type==2}]"></span>
-							{{item.title}}
+							<span :class="[{'meeting': item.type=='会议通知'},{'tian': item.type=='提案征集通知'}]"></span>
+							{{item.title ||  item.type +'标题'}}
 						</div>
 						<div class="msg text-1">
-							{{item.text}}
+							{{item.content}}
 						</div>
 					</view>
 				</view>
@@ -39,69 +39,41 @@
 		methods: {
 			// 上划加载更多
 			loadMore() {
-				this.getList();
+				if(this.currPage < this.totalPage){
+					this.currPage ++
+					this.getList();
+				}
 			},
 			// 下拉刷新数据列表
 			refresh() {
+				this.messageList =[]
+				this.currPage = 1;
 				this.getList();
 			},
 			changeTab(e) {
 				this.type = e;
 			},
 			getList() {
-				this.$request('/huiyi/sysmessage/list').then(res => {
-					
-				})
-				
-				
-				setTimeout(()=>{
-					this.messageList = [...this.messageList,...[{
-						type: 1,
-						title: '会议通知标题',
-						text: '国家卫生健康委员会提醒，酵米面中毒的主要原因生产'
-					}, {
-						type: 2,
-						title: '提案通知标题',
-						text: '深圳航空ZH9247航班在四川攀枝花机场'
-					}, {
-						type: 2,
-						title: '提案通知标题',
-						text: '小孩子的情绪转变有多快？看看这个被老师训话小男孩'
-					}, {
-						type: 1,
-						title: '会议通知标题',
-						text: '国家卫生健康委员会提醒，酵米面中毒的主要原因生产'
-					}, {
-						type: 2,
-						title: '提案通知标题',
-						text: '深圳航空ZH9247航班在四川攀枝花机场'
-					}, {
-						type: 2,
-						title: '提案通知标题',
-						text: '小孩子的情绪转变有多快？看看这个被老师训话小男孩'
-					}, {
-						type: 1,
-						title: '会议通知标题',
-						text: '国家卫生健康委员会提醒，酵米面中毒的主要原因生产'
-					}, {
-						type: 2,
-						title: '提案通知标题',
-						text: '深圳航空ZH9247航班在四川攀枝花机场'
-					}, {
-						type: 2,
-						title: '提案通知标题',
-						text: '小孩子的情绪转变有多快？看看这个被老师训话小男孩'
-					}, ]]
-					
-					this.currPage=1;
-					this.totalPage=1;
-					
+				let url = '';
+				if(this.type == 1){ //未读消息
+					url ='/huiyi/sysmessage/list';
+				}
+				if(this.type == 2){ //历史消息
+					url ='/huiyi/sysmessage/history';
+				}
+				this.$request(url,{
+					limit: 10,
+					page: this.currPage
+				}).then(res => {
+					console.log(res)
+					this.totalPage = Math.ceil(res.total / 10);
+					this.messageList = [...this.messageList,...res.list]
 					this.$refs.loadRefresh.loadOver();
-				},1000)
+				})
 			},
 			toPage(obj){
-				if(obj.type==1){
-					this.$tools.goToPage('detail')
+				if(obj.type=='会议通知'){
+					this.$tools.goToPage('detail?id=' + obj.id)
 				}else{
 					this.$tools.goToPage('detail1')
 				}
@@ -109,7 +81,8 @@
 		},
 		watch: {
 			type() {
-				this.page = 1;
+				this.currPage = 1;
+				this.messageList = [];
 				this.getList();
 			}
 		}

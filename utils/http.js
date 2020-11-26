@@ -20,11 +20,11 @@ const request = (url = '', data = {}, type = 'GET', header) => {
 			dataType: 'json',
 		}).then((response) => {
 			let [error, res] = response;
-			console.log(response)
+			// console.log(res)
 			//请求成功
 			if(res.data.code == 0){
 				uni.hideLoading();
-				resolve(res.data);
+				resolve(res.data.data);
 			}else{
 				uni.showToast({
 				    title: res.data.msg,

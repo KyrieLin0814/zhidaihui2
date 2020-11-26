@@ -45,6 +45,7 @@
 					location: '第三会议室',
 					text: '国家卫生健康委员会提醒，酵米面中毒的主要原因生产'
 				},
+				showTextarea: false,
 				items:[{
 					value: '1',
 					name: '是'
@@ -56,7 +57,10 @@
 				reason:'',
 			}
 		},
-		onLoad() {
+		onLoad(options) {
+			this.$request(`/huiyi/sysmessage/${options.id}`).then(res => {
+				console.log(res)
+			})
 		},
 		methods: {
 			submitFunc(){
