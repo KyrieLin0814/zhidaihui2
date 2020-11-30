@@ -142,8 +142,16 @@
 		computed: {
 
 		},
-		onLoad() {
-
+		onLoad(options) {
+			this.$request('/huiyi/meetingquestion/list',{
+				meetingId: options.id
+			}).then(res => {
+				
+			})
+		},
+		onShow() {
+			
+			
 		},
 		methods: {
 			radioChange(){

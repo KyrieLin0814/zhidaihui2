@@ -65,7 +65,6 @@
 					limit: 10,
 					page: this.currPage
 				}).then(res => {
-					console.log(res)
 					this.totalPage = Math.ceil(res.total / 10);
 					this.messageList = [...this.messageList,...res.list]
 					this.$refs.loadRefresh.loadOver();
