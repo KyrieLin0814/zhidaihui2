@@ -1,16 +1,16 @@
 <template>
-	<view class="container">
+	<view class="container" v-if="Object.keys(data).length">
 		<view class="item time">
 			<p>会议时间</p>
-			<div class="icon">{{data.time}}</div>
+			<div class="icon">{{data.startTime}}</div>
 		</view>
 		<view class="item location">
 			<p>会议地点</p>
-			<div class="icon">{{data.location}}</div>
+			<div class="icon">{{data.room.name}}</div>
 		</view>
 		<view class="item content">
 			<p>通知内容</p>
-			<div>{{data.text}}</div>
+			<div>{{data.notifyContent}}</div>
 		</view>
 		<view class="item content">
 			<p>是否参会</p>
@@ -26,8 +26,8 @@
 		<view class="item reason" v-if="showTextarea">
 			<p>请假原因</p>
 			<view class="uni-textarea">
-				<textarea placeholder='请输入请假原因' placeholder-style="color:#D5D5D5" v-model="reason" />
-				</view>
+				<textarea placeholder='请输入请假原因' placeholder-style="color:#D5D5D5" v-model="reason"></textarea>
+			</view>
 		</view>
 		<view class="bottomBtns flex">
 			<button type="primary" class="full" @click="submitFunc">确认</button>
@@ -39,37 +39,61 @@
 	export default {
 		data() {
 			return {
-				data:{
-					title: '会议通知标题',
-					time: '2020-05-05',
-					location: '第三会议室',
-					text: '国家卫生健康委员会提醒，酵米面中毒的主要原因生产'
-				},
+				data: {},
 				showTextarea: false,
-				items:[{
+				items: [{
 					value: '1',
 					name: '是'
-				},{
+				}, {
 					value: '0',
 					name: '否'
 				}],
 				current: 0,
-				reason:'',
+				reason: '',
 			}
 		},
 		onLoad(options) {
 			this.$request(`/huiyi/sysmessage/${options.id}`).then(res => {
-				console.log(res)
+				this.data = res.meetingInfo;
 			})
 		},
 		methods: {
-			submitFunc(){
+			submitFunc() {
+				if(this.current && !this.reason){
+					uni.showToast({
+					    title: '请输入请假原因',
+					    duration: 1500,
+						icon : 'none'
+					});
+					return
+				}
 				uni.showModal({
 					title: '提示',
 					content: '是否确认提交?',
-					success: function (res) {
+					success: (res) => {
 						if (res.confirm) {
-							
+							if(this.current){ //不参会
+								this.$request('/huiyi/meeting/leave',{
+									meetingId: this.data.id,
+									remark: this.reason
+								},'POST').then(res => {
+									uni.showToast({
+									    title: res.msg,
+									    duration: 1000,
+									});
+									this.$tools.backRoute(1,1000);
+								})
+							}else{ //参会
+								this.$request('/huiyi/meeting/join',{
+									meetingId: this.data.id
+								},'POST').then(res => {
+									uni.showToast({
+									    title: res.msg,
+									    duration: 1000,
+									});
+									this.$tools.backRoute(1,1000);
+								})
+							}
 						} else if (res.cancel) {
 							console.log('用户点击取消');
 						}
@@ -83,16 +107,16 @@
 						break;
 					}
 				}
-				if(this.current == 1){
+				if (this.current == 1) {
 					this.showTextarea = true;
-				}else{
+				} else {
 					this.showTextarea = false;
 					this.reason = "";
 				}
 			}
 		},
 		watch: {
-			
+
 		}
 	}
 </script>
@@ -100,62 +124,70 @@
 <style scoped lang="scss">
 	.container {
 		.item {
-			padding:10px 16px;
-			line-height:2.2;
-			>p{
+			padding: 10px 16px;
+			line-height: 2.2;
+
+			>p {
 				font-weight: bold;
-				font-size:15px;
+				font-size: 15px;
 			}
-			>div{
-				font-size:14px;
+
+			>div {
+				font-size: 14px;
 			}
-			.icon{
-				padding-left:20px;
+
+			.icon {
+				padding-left: 20px;
 			}
-			&.time{
-				.icon{
+
+			&.time {
+				.icon {
 					background: url(../../static/image/date_icon.png) no-repeat left center;
 					background-size: 14px;
 				}
 			}
-			&.location{
-				.icon{
+
+			&.location {
+				.icon {
 					background: url(../../static/image/location_icon.png) no-repeat left center;
 					background-size: 14px;
 				}
 			}
-			&.content{
-				div{
-					line-height:1.4;
+
+			&.content {
+				div {
+					line-height: 1.4;
 				}
 			}
-			&.reason{
-				textarea{
-					font-size:14px;
-					border:1px solid #E5E5E5;
-					width:calc(100% - 16px);
-					padding:8px;
+
+			&.reason {
+				textarea {
+					font-size: 14px;
+					border: 1px solid #E5E5E5;
+					width: calc(100% - 16px);
+					padding: 8px;
 					border-radius: 5px;
-					height:125px;
+					height: 125px;
 				}
 			}
-			
-			.radioBox{
-				/deep/ uni-label{
+
+			.radioBox {
+				/deep/ uni-label {
 					margin-right: 20px;
-					
-					.uni-radio-input{
+
+					.uni-radio-input {
 						width: 16px;
-						height:16px;
-						&::before{
+						height: 16px;
+
+						&::before {
 							font-size: 16px;
 						}
 					}
 				}
 			}
 		}
-		
-		.bottomBtns{
+
+		.bottomBtns {
 			margin-top: 24px;
 		}
 	}

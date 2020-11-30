@@ -75,7 +75,7 @@
 				if(obj.type=='会议通知'){
 					this.$tools.goToPage('detail?id=' + obj.id)
 				}else{
-					this.$tools.goToPage('detail1')
+					this.$tools.goToPage('detail1?id=' + obj.id)
 				}
 			}
 		},

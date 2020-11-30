@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<view class="item name">
+		<!-- <view class="item name">
 			<p class="icon">{{data.title}}</p>
 		</view>
 		
@@ -17,7 +17,9 @@
 		<view class="item content">
 			<p>大会主席团</p>
 			<div v-html="data.member"></div>
-		</view>
+		</view> -->
+		
+		<view v-html="data.content"></view>
 		
 	</view>
 </template>
@@ -26,14 +28,15 @@
 	export default {
 		data() {
 			return {
-				data:{
-					title: '大会主席团',
-					text: '丁化礼、丁得祥、于可国、万萨星、万说湘、王食明、王峰东、王亚光、王刚、王拉民、王飞宁、王爱生、王索蒙（女）',
-					member: '秘书长：陈国郎</br>副秘书长：李红（女） 刘胜利'
-				},
+				data: {}
 			}
 		},
-		onLoad() {
+		onShow() {
+			this.$request('/huiyi/meetingdata/info',{
+				category: '组织机构'
+			}).then(res => {
+				this.data = res;
+			})
 		},
 		methods: {
 		},
@@ -45,6 +48,7 @@
 
 <style scoped lang="scss">
 	.container {
+		padding:10px 16px;
 		.item {
 			padding:10px 16px;
 			line-height:1.8;

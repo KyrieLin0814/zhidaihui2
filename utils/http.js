@@ -24,6 +24,12 @@ const request = (url = '', data = {}, type = 'GET', header) => {
 			//请求成功
 			if(res.data.code == 0){
 				uni.hideLoading();
+				if(!res.data.data){
+					res.data.data = {
+						msg: '成功'
+					};
+				}
+				console.log(res.data.data)
 				resolve(res.data.data);
 			}else{
 				uni.showToast({

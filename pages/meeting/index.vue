@@ -1,34 +1,37 @@
 <template>
 	<view class="container">
-		<view class="item name">
-			<p>会议名称</p>
-			<div class="icon">{{data.name}}</div>
-		</view>
-		<view class="item time">
-			<p>会议时间</p>
-			<div class="icon">{{data.time}}</div>
-		</view>
-		<view class="item location">
-			<p>会议地点</p>
-			<div class="icon">{{data.location}}</div>
-		</view>
-		<view class="item seat">
-			<p>作为位置</p>
-			<div class="icon">{{data.seat}}</div>
-		</view>
-
-		<view class="bottomBtns flex" v-if="showBtn">
-			<button type="primary" class="full" @click="submitFunc"><span>签到</span></button>
-		</view>
-
-		<view class="item countBox">
-			<p >到会情况统计</p>
-			<div class="list clearfix">
-				<div class="item fl" v-for="(item,index) in dataList" :key="index">
-					<div class="label">{{item.label}}</div>
-					<div class="value">{{item.count}}人</div>
+		<view v-if="Object.keys(data).length">
+			<view class="item name">
+				<p>会议名称</p>
+				<div class="icon">{{data.name}}</div>
+			</view>
+			<view class="item time">
+				<p>会议时间</p>
+				<div class="icon">{{data.startTime}}</div>
+			</view>
+			<view class="item location">
+				<p>会议地点</p>
+				<div class="icon">{{data.room.name || '暂无'}}</div>
+			</view>
+			<view class="item seat">
+				<p>座位位置</p>
+				<div class="icon">{{data.seatName || '暂无'}}</div>
+			</view>
+			
+			<view class="bottomBtns flex" v-if="showBtn">
+				<button type="primary" class="full" @click="submitFunc"><span>签到</span></button>
+			</view>
+			
+			<view class="item countBox">
+				<p >到会情况统计</p>
+				<div class="list clearfix" v-if="dataList.length">
+					<div class="item fl" v-for="(item,index) in dataList" :key="index">
+						<div class="label">{{item.label}}</div>
+						<div class="value">{{item.count}}人</div>
+					</div>
 				</div>
-			</div>
+				<div v-else>暂无</div>
+			</view>
 		</view>
 		
 		<view class="conBtns flex">
@@ -57,38 +60,57 @@
 		data() {
 			return {
 				showBtn:true,
-				data: {
-					name: '新疆油田公司四届五次会议',
-					time: '2020-05-05',
-					location: '第三会议室',
-					seat: '07排03座'
-				},
-				dataList: [{
-					label: '参会人员',
-					count: 152
-				}, {
-					label: '请假人员',
-					count: 12
-				}, {
-					label: '迟到人员',
-					count: 5
-				}, {
-					label: '旷会人员',
-					count: 1
-				}],
+				data: {},
+				dataList: []
 			}
 		},
-		onLoad() {},
+		onLoad() {
+		},
+		onShow() {
+			this.$request('/huiyi/meeting/info').then(res => {
+				this.data = res;
+				//签到按钮是否显示
+				if(res.userJoinStatus == 4){
+					this.showBtn = false;
+				}
+				//参会统计数据是否存在
+				if(res.report){
+					let obj = res.report;
+					this.dataList = [{
+						label: '参会人员',
+						count: obj['参会']
+					}, {
+						label: '请假人员',
+						count: obj['请假']
+					}, {
+						label: '迟到人员',
+						count: obj['迟到']
+					}, {
+						label: '旷会人员',
+						count: obj['旷会']
+					}]
+				}
+				
+			})
+		},
+		mounted() {
+			
+		},
 		methods: {
 			submitFunc() {
-				uni.showToast({
-					title: '签到成功',
-					icon: 'success',
-					mask:true
-				});
-				setTimeout(()=>{
-					this.showBtn = false;
-				},1500)
+				this.$request('/huiyi/meeting/join',{
+					meetingId: this.data.id
+				},'POST').then(res => {
+					uni.showToast({
+						title: '签到成功',
+						icon: 'success',
+						mask:true
+					});
+					setTimeout(()=>{
+						this.showBtn = false;
+					},1500)
+				})
+				
 			},
 		},
 		watch: {

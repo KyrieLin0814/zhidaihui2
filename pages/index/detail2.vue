@@ -1,6 +1,6 @@
 <template>
 	<view class="container">
-		<view class="con" v-for="(item,index) in data" :key="index">
+		<!-- <view class="con" v-for="(item,index) in data" :key="index">
 			<view class="item name">
 				<p class="icon name">{{item.title}}</p>
 			</view>
@@ -25,7 +25,9 @@
 				<p>会议地点</p>
 				<div class="icon zhuchiren">{{item.zhuchiren}}</div>
 			</view>
-		</view>
+		</view> -->
+		
+		<view v-html="data.content"></view>
 	</view>
 </template>
 
@@ -33,24 +35,15 @@
 	export default {
 		data() {
 			return {
-				data:[{
-					title: '2020年职工代表大会议程',
-					date: '2020-10-20 14:00:00',
-					text: '1、大会开幕式</br>2、听取和审议公司经理工作报告</br>3、听取公司职代会工作报告',
-					member: '全体人员',
-					location: '大会议室',
-					zhuchiren: '张萱'
-				},{
-					title: '2020年职工代表大会议程',
-					date: '2020-10-20 14:00:00',
-					text: '1、大会开幕式</br>2、听取和审议公司经理工作报告</br>3、听取公司职代会工作报告',
-					member: '全体人员',
-					location: '大会议室',
-					zhuchiren: '张萱'
-				}],
+				data: {},
 			}
 		},
-		onLoad() {
+		onShow() {
+			this.$request('/huiyi/meetingdata/info',{
+				category: '会议日程'
+			}).then(res => {
+				this.data = res;
+			})
 		},
 		methods: {
 		},
@@ -62,6 +55,7 @@
 
 <style scoped lang="scss">
 	.container {
+		padding:10px 16px;
 		.con{
 			margin-bottom: 24px;
 		}
