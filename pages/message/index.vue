@@ -34,7 +34,7 @@
 			}
 		},
 		mounted() {
-			this.$refs.loadRefresh.runRefresh()
+			this.$refs.loadRefresh.runRefresh();
 		},
 		methods: {
 			// 上划加载更多
@@ -48,6 +48,7 @@
 			refresh() {
 				this.messageList =[]
 				this.currPage = 1;
+				this.$refs.loadRefresh.runRefresh()
 				this.getList();
 			},
 			changeTab(e) {
@@ -67,7 +68,6 @@
 				}).then(res => {
 					this.totalPage = Math.ceil(res.total / 10);
 					this.messageList = [...this.messageList,...res.list]
-					this.$refs.loadRefresh.loadOver();
 				})
 			},
 			toPage(obj){

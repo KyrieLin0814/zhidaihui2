@@ -53,12 +53,15 @@
 		},
 		onLoad(options) {
 			let id = options.id;
+			let token = uni.getStorageSync('token');
 			if(!id){
-				uni.showToast({
-				    title: '请登录',
-				    duration: 1500,
-					icon : 'none'
-				});
+				if(!token){
+					uni.showToast({
+					    title: '请登录',
+					    duration: 1500,
+						icon : 'none'
+					});
+				}
 				return
 			}
 			//登录

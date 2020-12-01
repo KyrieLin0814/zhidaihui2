@@ -72,7 +72,7 @@
 		data() {
 			return {
 				questionId:'',
-				isMine: true,
+				isMine: false,
 				currentStatus: 0, //当前题目的状态
 				current: '', //选中将要发起的题目ID
 				
