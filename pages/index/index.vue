@@ -51,13 +51,26 @@
 				}]
 			}
 		},
-		mounted() {
+		onLoad(options) {
+			let id = options.id;
+			if(!id){
+				uni.showToast({
+				    title: '请登录',
+				    duration: 1500,
+					icon : 'none'
+				});
+				return
+			}
 			//登录
 			this.$request('/huiyi/user/login', {
-				userId:'1'
+				userId:id
 			},'POST').then(res => {
 				uni.setStorageSync('token', res.token);
+				uni.setStorageSync('userId', res.userId);
 			})
+		},
+		mounted() {
+			
 		},
 		methods: {
 

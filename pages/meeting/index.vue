@@ -36,7 +36,7 @@
 		
 		<view class="conBtns flex">
 			<view class="full">
-				<div class="part" @click="$tools.goToPage('decision?id=' + data.id)">
+				<div class="part" @click="$tools.goToPage('decision?id=' + data.id + '&mainUser=' + data.mainUser)">
 					<div class="con">
 						<img :src="require('../../static/image/biaojue.png')">
 						<span>表决</span>
@@ -44,7 +44,7 @@
 				</div>
 			</view>
 			<view class="full">
-				<div class="part" @click="$tools.goToPage('vote?id=' + data.id)">
+				<div class="part" @click="$tools.goToPage('vote?id=' + data.id  + '&mainUser=' + data.mainUser)">
 					<div class="con">
 						<img :src="require('../../static/image/toupiao.png')">
 						<span>投票</span>

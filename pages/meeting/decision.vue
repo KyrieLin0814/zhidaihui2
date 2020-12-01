@@ -1,7 +1,9 @@
 <template>
 	<view class="container flex">
 		<view class="btn">
-			<button type="primary" @click="voteFunc">发起投票</button>
+			<button type="primary" @click="voteStart" v-if="isMine && currentStatus == 1">发起投票</button>
+			<button type="primary" @click="voteEnd" v-if="isMine && currentStatus == 2">结束投票</button>
+			<button type="primary" @click="voteFunc">确认投票</button>
 		</view>
 		<view class="list full">
 			<radio-group @change="radioChange">
@@ -9,45 +11,52 @@
 					<view class="flex">
 						<label class="content full">
 							<div class="title flex">
-								<radio :value="item.id" :checked="index === current" />
+								<radio :value="item.id" :checked="item.id == current" />
 								<p class="full">{{item.title}}</p>
 							</div>
 							<div class="tip">
-								<span class="time">{{item.time}}</span>
-								<span class="duration">{{item.duration}}分钟</span>
+								<span class="time">{{item.startVoteTime || '--'}}</span>
+								<span class="duration">{{item.answerTime}}分钟</span>
 							</div>
 							<div class="result">
-								<span>{{statusOptions[item.status]}}</span>
-								<span>{{tpStatusOptions[item.tpStatus]}}</span>
+								<span>{{item.statusName}}</span>
+								<span>{{item.userVoteStatus || '未投票'}}</span>
 							</div>
 						</label>
 
 						<!-- 如果投票进行中 显示选项 -->
-						<div class="voteBox" v-if="item.status != 0">
-							<!-- 已投票 -->
-							<div class="voteCon" v-if="item.tpStatus == 1">
+						<div class="voteBox" v-if="item.status != 1 ">
+							<!-- 已结束 -->
+							<div class="voteCon" v-if="item.status == 3 ">
 								<div class="flex">
-									<div class="con full"  v-if="item.choose == '1'">
-										<span class="img tg"></span>
-										<span>通过</span>
-									</div>
-									<div class="con full" v-if="item.choose == '0'">
-										<span class="img btg"></span>
-										<span>不通过</span>
+									<div class="con full"  
+										v-for="(i, idx) in item.answerList" :key="idx"
+										v-show="item.userVoteAnswer == i.id">
+										<span class="img" :class="[{'tg': i.content == '通过'},{'btg': i.content == '不通过'}]"></span>
+										<span>{{i.content}}</span>
 									</div>
 								</div>
 							</div>
 
-							<!-- 未投票 -->
-							<div class="voteCon" v-else>
-								<div class="flex">
-									<div class="con full" @click="chooseFunc(index, '1')" :class="{'choose': item.choose == '1'}">
-										<span class="img tg"></span>
-										<span>通过</span>
+							<!-- 进行中 -->
+							<div class="voteCon" v-if="item.status == 2 ">
+								<!-- 已投 -->
+								<div class="flex" v-if="item.userVoteAnswer">
+									<div class="con full"
+										v-for="(i, idx) in item.answerList" :key="idx"
+										v-show="item.userVoteAnswer == i.id">
+										<span class="img" :class="[{'tg': i.content == '通过'},{'btg': i.content == '不通过'}]"></span>
+										<span>{{i.content}}</span>
 									</div>
-									<div class="con full" @click="chooseFunc(index, '0')" :class="{'choose': item.choose == '0'}">
-										<span class="img btg"></span>
-										<span>不通过</span>
+								</div>
+								<!-- 未投 -->
+								<div class="flex" v-else>
+									<div class="con full"
+										v-for="(i, idx) in item.answerList" :key="idx"
+										@click="chooseFunc(i.id)"
+										:class="{'choose': chooseCurrent == i.id}">
+										<span class="img" :class="[{'tg': i.content == '通过'},{'btg': i.content == '不通过'}]"></span>
+										<span>{{i.content}}</span>
 									</div>
 								</div>
 							</div>
@@ -55,7 +64,7 @@
 					</view>
 
 					<!-- 如果投票已完成 显示结果 -->
-					<div class="txt" v-if="item.status == 2">投票结果：{{item.result}}</div>
+					<div class="txt" v-if="item.status == 3">投票结果：{{item.result}}</div>
 				</view>
 			</radio-group>
 
@@ -67,66 +76,163 @@
 	export default {
 		data() {
 			return {
-				current: '',
-				statusOptions: ['未开始', '进行中', '已终止'],
-				tpStatusOptions: ['未投票', '已投票'],
-				dataList: [{
-					id: '1',
-					title: '这是投票的标题',
-					time: '2020-10-20 15:30:00',
-					duration: '7',
-					status: 0,
-					tpStatus: 0,
-					choose: '',
-					result: ''
-				}, {
-					id: '2',
-					title: '这是投票的标题',
-					time: '2020-10-20 15:30:00',
-					duration: 7,
-					status: 1,
-					tpStatus: 0,
-					choose: '',
-					result: ''
-				}, {
-					id: '3',
-					title: '这是投票的标题',
-					time: '2020-10-20 15:30:00',
-					duration: 7,
-					status: 1,
-					tpStatus: 1,
-					choose: '1',
-					result: ''
-				}, {
-					id: '4',
-					title: '这是投票的标题',
-					time: '2020-10-20 15:30:00',
-					duration: 7,
-					status: 2,
-					tpStatus: 1,
-					choose: '0',
-					result: '通过405人，不通过189人，弃权19人'
-				}],
+				questionId:'',
+				isMine: true,
+				currentStatus: 0, //当前题目的状态
+				current: '', //选中将要发起的题目ID
+				
+				chooseCurrent : '', //选中投票选项的ID
+				chooseName: '', //选中投票选项的名字
+				chooseAnswer : '', //选中投票的选项的题目ID
+				dataList: []
 			}
 		},
 		computed: {
 
 		},
-		onLoad() {
-
+		onLoad(options) {
+			this.questionId = options.id;
+			if(options.mainUser == uni.getStorageSync('userId')){
+				this.isMine = true;
+			}
+			this.getList();
 		},
 		methods: {
-			radioChange() {
-
+			getList(){
+				this.$request('/huiyi/meetingquestion/list',{
+					meetingId: this.questionId,
+					type: 1
+				}).then(res => {
+					let arr = [];
+					res.forEach(item=>{
+						if(item.status == 3){
+							let resultArr = [];
+							item.answerList.forEach(j=>{
+								resultArr.push(j.content + j.count + '人');
+							})
+							item.result = resultArr.join('，');
+						}
+						item.result += '。';
+						arr.push(item);
+					})
+					this.dataList = arr;
+					this.currentStatus=0;
+					this.current = '';
+				})
 			},
-			chooseFunc(index, choose) {
-				this.dataList[index].choose = choose;
+			radioChange(evt) {
+				this.current = evt.target.value;
 				
-				
-				console.log(this.dataList[index].choose)
+				this.dataList.forEach(item=>{
+					if(item.id == this.current){
+						this.currentStatus = item.status;
+					}
+				})
 			},
-			voteFunc() {
-
+			chooseFunc(id) {
+				this.chooseCurrent = id;
+				this.dataList.forEach(i=>{
+					i.answerList.forEach(j=>{
+						if(j.id == this.chooseCurrent){
+							this.chooseAnswer = i.id;
+							this.chooseName = j.content;
+						}
+					})
+				})
+			},
+			voteFunc(){
+				if(!this.chooseCurrent){
+					uni.showToast({
+					    title: '请选择将要表决的对象',
+					    duration: 1000,
+						icon : 'none'
+					});
+					return
+				}
+				uni.showModal({
+					title: '提示',
+					content: '是否确定要选择' + this.chooseName + '？',
+					success: (res) => {
+						if (res.confirm) {
+							this.$request('/huiyi/meetingquestion/vote',{
+								questionId: this.chooseAnswer,
+								answerId: this.chooseCurrent
+							},'POST').then(res => {
+								uni.showToast({
+								    title: res.msg,
+								    duration: 1000,
+								});
+								setTimeout(()=>{
+									this.getList();
+								},1000)
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
+			},
+			voteStart(){
+				if(!this.current){
+					uni.showToast({
+					    title: '请选择将要发起的表决',
+					    duration: 1000,
+						icon : 'none'
+					});
+					return
+				}
+				uni.showModal({
+					title: '提示',
+					content: '是否确定要发起表决？',
+					success: (res) => {
+						if (res.confirm) {
+							this.$request('/huiyi/meetingquestion/vote/start',{
+								questionId: this.current
+							},'POST').then(res => {
+								uni.showToast({
+								    title: res.msg,
+								    duration: 1000,
+								});
+								setTimeout(()=>{
+									this.getList();
+								},1000)
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
+			},
+			voteEnd(){
+				if(!this.current){
+					uni.showToast({
+					    title: '请选择将要结束的表决',
+					    duration: 1000,
+						icon : 'none'
+					});
+					return
+				}
+				uni.showModal({
+					title: '提示',
+					content: '是否确定要结束表决？',
+					success: (res) => {
+						if (res.confirm) {
+							this.$request('/huiyi/meetingquestion/vote/end',{
+								questionId: this.current
+							},'POST').then(res => {
+								uni.showToast({
+								    title: res.msg,
+								    duration: 1000,
+								});
+								setTimeout(()=>{
+									this.getList();
+								},1000)
+							})
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				})
 			}
 		},
 		watch: {
@@ -139,11 +245,13 @@
 	.container {
 		flex-flow: column;
 
-		.btn {
-			padding: 5px 16px;
+		.btn{
+			padding:5px 16px; 
 			text-align: right;
-
-			uni-button {
+			uni-button{
+				margin-left: 12px;
+				font-size: 14px;
+				line-height: 36px;
 				display: inline-block;
 			}
 		}
