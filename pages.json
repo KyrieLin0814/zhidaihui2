@@ -14,7 +14,7 @@
 	{
 		"path": "pages/message/index",
 		"style": {
-			"navigationBarTitleText": "消息中心"
+			"navigationBarTitleText": "我的消息"
 		}
 	}, {
 		"path": "pages/index/detail1",
@@ -97,7 +97,7 @@
 			"pagePath": "pages/message/index",
 			"iconPath": "static/image/message_icon.png",
 			"selectedIconPath": "static/image/message_click.png",
-			"text": "消息中心"
+			"text": "我的消息"
 		}]
 	},
 	//全局样式
