@@ -14,17 +14,17 @@
 						<view class="td index">序号</view>
 						<view class="td full">姓名</view>
 						<view class="td full">性别</view>
-						<view class="td full">民族</view>
+						<!-- <view class="td full">民族</view> -->
 						<view class="td zhiwu">职务</view>
 					</view>
 				</view>
 				<view class="tbody">
 					<view class="tr flex" v-for="(item,index) in data" :key="index">
 						<view class="td index"><span>{{index+1}}</span></view>
-						<view class="td full"><span>{{item.name}}</span></view>
-						<view class="td full"><span>{{item.rex}}</span></view>
-						<view class="td full"><span>{{item.mz}}</span></view>
-						<view class="td zhiwu"><span>{{item.zw}}</span></view>
+						<view class="td full"><span>{{item.userName}}</span></view>
+						<view class="td full"><span>{{item.sex == 1? '男' : '女'}}</span></view>
+						<!-- <view class="td full"><span>{{item.mz}}</span></view> -->
+						<view class="td zhiwu"><span>{{item.posName}}</span></view>
 					</view>
 				</view>
 			</view>
@@ -38,30 +38,14 @@
 	export default {
 		data() {
 			return {
-				data:[ {
-					name:'张晓航',
-					rex: '男',
-					mz: '汉族',
-					zw: "公司经理"
-				},{
-					name:'张晓航',
-					rex: '男',
-					mz: '汉族',
-					zw: "公司经理"
-				},{
-					name:'张晓航',
-					rex: '男',
-					mz: '汉族',
-					zw: "公司经理"
-				},{
-					name:'张晓航',
-					rex: '男',
-					mz: '汉族',
-					zw: "公司经理"
-				}],
+				data:[],
 			}
 		},
-		onLoad() {},
+		onLoad() {
+			this.$request('/huiyi/meetingdata/joinUser').then(res => {
+				this.data = res;
+			})
+		},
 		methods: {},
 		watch: {
 
