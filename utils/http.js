@@ -1,4 +1,5 @@
 const baseUrl = 'http://test.51meilun.com:9102/api'
+import tools from './tools.js'
 const request = (url = '', data = {}, type = 'GET', header) => {
 	return new Promise((resolve, reject) => {
 		uni.showLoading({
@@ -31,6 +32,10 @@ const request = (url = '', data = {}, type = 'GET', header) => {
 				}
 				console.log(res.data.data)
 				resolve(res.data.data);
+			}else if(res.data.code == 10020 || res.data.code == 10021 ){ //token失效重新登陆
+				console.log('token失效')
+				uni.hideLoading();
+				tools.loginFunc();
 			}else{
 				uni.showToast({
 				    title: res.data.msg,

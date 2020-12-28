@@ -304,6 +304,9 @@ uni-modal .uni-modal__ft {
 	line-height:40px;
 }
 
+uni-radio[disabled] .uni-radio-input{
+	background: #f5f5f5;
+}
 /* 弹窗 */
 .uni-popup{
 	z-index: 999!important;

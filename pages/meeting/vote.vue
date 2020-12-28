@@ -1,16 +1,16 @@
 <template>
 	<view class="container flex">
-		<view class="btn">
-			<button type="primary" @click="voteStart" v-if="isMine && currentStatus == 1">发起投票</button>
-			<button type="primary" @click="voteEnd" v-if="isMine && currentStatus == 2">结束投票</button>
-			<button type="primary" @click="voteFunc">确认投票</button>
+		<view class="btn" v-if="isMine">
+			<button type="primary" @click="voteStart">发起投票</button>
+			<button type="primary" @click="voteEnd">结束投票</button>
+			<!-- <button type="primary" @click="voteFunc">确认投票</button> -->
 		</view>
 		<view class="list full">
 			<radio-group @change="radioChange">
 				<view class="item" v-for="(item, index) in dataList" :key="index">
 					<label class="content">
 						<div class="title flex">
-							<radio :value="item.id" :checked="item.id == current" />
+							<radio :value="item.id" :checked="item.id == current" :disabled="item.status == 3"/>
 							<p class="full">{{item.title}}</p>
 						</div>
 						<div class="tip">
@@ -138,14 +138,14 @@
 				})
 			},
 			voteFunc(){
-				if(!this.chooseCurrent){
-					uni.showToast({
-					    title: '请选择将要投票的对象',
-					    duration: 1000,
-						icon : 'none'
-					});
-					return
-				}
+				// if(!this.chooseCurrent){
+				// 	uni.showToast({
+				// 	    title: '请选择将要投票的对象',
+				// 	    duration: 1000,
+				// 		icon : 'none'
+				// 	});
+				// 	return
+				// }
 				uni.showModal({
 					title: '提示',
 					content: '是否确定要投票给' + this.chooseName + '？',
@@ -165,6 +165,9 @@
 							})
 						} else if (res.cancel) {
 							console.log('用户点击取消');
+							this.chooseAnswer = '';
+							this.chooseName = '';
+							this.chooseCurrent = '';
 						}
 					}
 				})
@@ -173,6 +176,22 @@
 				if(!this.current){
 					uni.showToast({
 					    title: '请选择将要发起的投票',
+					    duration: 1000,
+						icon : 'none'
+					});
+					return
+				}
+				if(this.currentStatus == 2){
+					uni.showToast({
+					    title: '该投票已开始',
+					    duration: 1000,
+						icon : 'none'
+					});
+					return
+				}
+				if(this.currentStatus == 3){
+					uni.showToast({
+					    title: '该投票已结束',
 					    duration: 1000,
 						icon : 'none'
 					});
@@ -209,6 +228,22 @@
 					});
 					return
 				}
+				if(this.currentStatus == 1){
+					uni.showToast({
+					    title: '该投票未开始',
+					    duration: 1000,
+						icon : 'none'
+					});
+					return
+				}
+				if(this.currentStatus == 3){
+					uni.showToast({
+					    title: '该投票已结束',
+					    duration: 1000,
+						icon : 'none'
+					});
+					return
+				}
 				uni.showModal({
 					title: '提示',
 					content: '是否确定要结束投票？',
@@ -233,7 +268,11 @@
 			}
 		},
 		watch: {
-
+			chooseCurrent(newV,oldV){
+				if(newV){
+					this.voteFunc();
+				}
+			}
 		}
 	}
 </script>

@@ -1,0 +1,18 @@
+{
+  "name": "youtong-jsapi",
+  "version": "1.0.3",
+  "description": "邮筒H5微应用开发JSAPI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+	"build": "webpack",
+	"prepublish": "webpack"
+  },
+  "author": "youtong js group",
+  "license": "ISC",
+  "devDependencies": {
+    "terser-webpack-plugin": "^5.0.3",
+    "webpack": "^5.10.0",
+    "webpack-cli": "^4.2.0"
+  }
+}

@@ -106,9 +106,10 @@
 						icon: 'success',
 						mask:true
 					});
-					setTimeout(()=>{
-						this.showBtn = false;
-					},1500)
+					this.showBtn = false;
+					// setTimeout(()=>{
+					// 	this.showBtn = false;
+					// },1500)
 				})
 				
 			},
